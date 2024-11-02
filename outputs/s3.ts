@@ -1,9 +1,8 @@
 import {Client, ClientOptions} from 'minio';
 import {AbstractOutput} from "./index";
-import {PassThrough, Readable, Writable} from "node:stream";
+import {PassThrough} from "node:stream";
 import {Event} from "../index";
-import {createReadStream} from "node:fs";
-import {createContext, Script} from "node:vm";
+import {Script} from "node:vm";
 
 export interface S3OutputConfig extends Record<string, unknown> {
 	/**
@@ -74,14 +73,14 @@ class S3Buffer extends PassThrough {
 export class S3 extends AbstractOutput {
 	protected client: Client;
 	protected buffers: Record<string, S3Buffer> = {};
-	protected partition: Script;
+	protected partition: Function;
 
 	constructor(protected readonly config: S3OutputConfig) {
 		super();
 
 		this.client = new Client(config.s3config);
 
-		this.partition = new Script(`(function (event) { return \`${config.partition}\`; })`);
+		this.partition = new Script(`(function (event) { return \`${config.partition}\`; })`).runInNewContext();
 	}
 
 	_write(event: Event, encoding: BufferEncoding, callback: (error?: (Error | null)) => void) {
@@ -98,7 +97,7 @@ export class S3 extends AbstractOutput {
 	 * Resolves a partition expression to a string
 	 */
 	resolvePartition(event: any): string {
-		return this.partition.runInNewContext()(event);
+		return this.partition(event);
 	}
 
 	/**
