@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "d3-time-format": "^4.1.0",
+    "es-toolkit": "^1.26.1",
     "js-yaml": "^4.1.0",
     "kafkajs": "^2.2.4",
     "minio": "^8.0.0",
