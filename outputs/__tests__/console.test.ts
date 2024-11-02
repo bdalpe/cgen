@@ -20,7 +20,7 @@ describe('Console', () => {
         consoleOutput._write(chunk, encoding, callback);
 
         expect(callback).toHaveBeenCalled();
-        expect(console.log).toHaveBeenCalledWith(Buffer.from(JSON.stringify(chunk) + '\n'));
+        expect(console.log).toHaveBeenCalledWith(JSON.stringify(chunk));
     });
 
     it('calls the callback after logging', () => {
@@ -29,7 +29,7 @@ describe('Console', () => {
         consoleOutput._write(chunk, encoding, callback);
 
         expect(callback).toHaveBeenCalled();
-        expect(console.log).toHaveBeenCalledWith(Buffer.from(JSON.stringify(chunk) + '\n'));
+        expect(console.log).toHaveBeenCalledWith(JSON.stringify(chunk));
     });
 
     it('handles multiple writes correctly', () => {
@@ -45,7 +45,7 @@ describe('Console', () => {
         expect(callback).toHaveBeenCalledTimes(chunks.length);
         expect(console.log).toHaveBeenCalledTimes(chunks.length);
         chunks.forEach(chunk => {
-            expect(console.log).toHaveBeenCalledWith(Buffer.from(JSON.stringify(chunk) + '\n'));
+            expect(console.log).toHaveBeenCalledWith(JSON.stringify(chunk));
         });
     });
 });
