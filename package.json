@@ -1,0 +1,30 @@
+{
+  "name": "cgen",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node ./index.ts",
+    "build": "rm -rf dist && esbuild functions/index.ts --bundle --platform=node --minify --outdir=dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "d3-time-format": "^4.1.0",
+    "js-yaml": "^4.1.0",
+    "kafkajs": "^2.2.4",
+    "minio": "^8.0.0",
+    "pg": "^8.12.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.6",
+    "@types/node": "^20.8.0",
+    "@types/pg": "^8.11.6",
+    "esbuild": "^0.21.5",
+    "nock": "^13.5.5",
+    "tsx": "^4.19.1",
+    "typescript": "^5.2.2",
+    "vitest": "^1.6.0"
+  }
+}
