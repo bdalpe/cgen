@@ -1,0 +1,21 @@
+generators:
+  simple:
+    interval: 1
+    samples:
+      - hello, {{world}}!
+pipelines:
+  tokenizer:
+    - type: token
+      token: world
+      pickFrom:
+        - world
+        - you
+        - there
+outputs:
+  console:
+    type: console
+routes:
+  - generator: simple
+    pipelines:
+      - tokenizer
+    output: console
