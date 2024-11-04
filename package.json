@@ -1,6 +1,6 @@
 {
   "name": "cgen",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "index.js",
   "scripts": {
     "dev": "tsx ./index.ts",
@@ -22,6 +22,7 @@
     "@types/js-yaml": "^4.0.6",
     "@types/node": "^20.8.0",
     "@types/pg": "^8.11.6",
+    "bumpp": "^9.8.1",
     "esbuild": "^0.21.5",
     "esbuild-plugin-copy": "^2.1.1",
     "nock": "^13.5.5",
