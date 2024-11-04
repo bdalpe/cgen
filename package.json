@@ -1,11 +1,10 @@
 {
   "name": "cgen",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node ./index.ts",
-    "build": "rm -rf dist && esbuild functions/index.ts --bundle --platform=node --minify --outdir=dist",
+    "dev": "tsx ./index.ts",
+    "build": "rm -rf dist && tsx esbuild.config.ts",
     "test": "vitest --run"
   },
   "keywords": [],
@@ -24,6 +23,7 @@
     "@types/node": "^20.8.0",
     "@types/pg": "^8.11.6",
     "esbuild": "^0.21.5",
+    "esbuild-plugin-copy": "^2.1.1",
     "nock": "^13.5.5",
     "tsx": "^4.19.1",
     "typescript": "^5.2.2",
