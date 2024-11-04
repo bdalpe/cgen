@@ -48,7 +48,7 @@ const pipelines: Record<string, PipelineFunction> = {};
 const outputs: Record<string, AbstractOutput> = {};
 const routes: Route[] = [];
 
-const file = readFileSync(join(__dirname, "examples", "simple", "simple.yaml"));
+const file = readFileSync(join(__dirname, "config.yaml"));
 const config = load(file.toString()) as Config;
 
 Object.keys(config.generators).forEach(gen => {
