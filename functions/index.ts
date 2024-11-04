@@ -15,7 +15,7 @@ export class PipelineFunction extends Transform {
 	constructor(protected readonly func: string, protected readonly config: Record<string, unknown>) {
 		super({objectMode: true});
 
-		const path = join(__dirname, this.func, "index.js");
+		const path = join(__dirname, "functions", this.func, "index.js");
 
 		// Check if the function is a file path
 		if (!existsSync(path)) {
