@@ -1,0 +1,7 @@
+services:
+  cgen:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./examples/simple/simple.yaml:/app/config.yaml
