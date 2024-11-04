@@ -16,7 +16,7 @@ RUN chmod +x /tini
 
 FROM node:bookworm-slim
 COPY --from=builder /tini /tini
-COPY --from=builder /app/dist/index.js /app/index.js
+COPY --from=builder /app/dist/ /app/
 
 ENTRYPOINT ["/tini", "--"]
 CMD ["node", "/app/index.js"]
