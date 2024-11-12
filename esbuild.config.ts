@@ -10,7 +10,7 @@ build({
   plugins: [
     copy({
       assets: {
-        from: 'functions/**/*.js',
+        from: 'src/functions/**/*.js',
         to: 'functions',
       }
     }),
