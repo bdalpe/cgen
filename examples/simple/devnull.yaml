@@ -1,0 +1,11 @@
+generators:
+  simple:
+    interval: 1
+    samples:
+      - hello, world!
+outputs:
+  devnull:
+    type: devnull
+routes:
+  - generator: simple
+    output: devnull
