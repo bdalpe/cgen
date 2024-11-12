@@ -2,8 +2,8 @@ import {Writable, type WritableOptions} from "node:stream";
 import {type Event} from "../index";
 
 export abstract class AbstractOutput extends Writable {
-    constructor(protected readonly config?: Record<string, unknown>, opts?: WritableOptions) {
-        super({...opts, objectMode: true});
+    constructor(protected readonly config?: Record<string, unknown>) {
+        super({objectMode: true});
     }
 
     /**

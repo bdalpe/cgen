@@ -8,8 +8,14 @@ import {Interval} from "./generators/interval";
 import {PipelineFunction} from "./functions";
 import {omit} from "es-toolkit";
 import {pipeline} from "node:stream";
-
-const { program } = require('commander');
+import {program} from 'commander';
+import {Devnull} from "./outputs/devnull";
+import {HttpOut} from "./outputs/http";
+import {Postgresql} from "./outputs/postgresql";
+import {S3} from "./outputs/s3";
+import {SplunkHec} from "./outputs/splunkhec";
+import {Syslog} from "./outputs/syslog";
+import {Tcp} from "./outputs/tcp";
 
 export interface Event {
 	time: Date;
@@ -33,11 +39,12 @@ export interface Generator {
 
 export interface IFunction {
 	type: string;
+
 	[prop: string]: unknown;
 }
 
 export interface Output {
-	type: string;
+	type: keyof typeof OUTPUTS;
 }
 
 export interface Route {
@@ -46,48 +53,61 @@ export interface Route {
 	output: string | string[];
 }
 
+const OUTPUTS = {
+	console: Console,
+	devnull: Devnull,
+	http: HttpOut,
+	postgres: Postgresql,
+	s3: S3,
+	hec: SplunkHec,
+	syslog: Syslog,
+	tcp: Tcp
+} as const;
+
 function run(config: Config) {
 	const generators: Record<string, AbstractGenerator> = {};
 	const pipelines: Record<string, PipelineFunction[]> = {};
 	const outputs: Record<string, AbstractOutput> = {};
-	const routes: Route[] = [];
 
-	Object.keys(config.generators).forEach(gen => {
+	for (const gen in config.generators) {
 		const generator = new Interval(config.generators[gen] as BaseGeneratorConfig);
 		generator.init();
 
 		generators[gen] = generator;
-	});
+	}
 
-	Object.keys(config.pipelines).forEach(p => {
-		// chain all functions together using .pipe()
-		pipelines[p] = config.pipelines[p].map(((pipe, index) => {
-			const c = config.pipelines[p][index];
-			const cfg = omit(c, ["type"]);
-
+	for (const p in config.pipelines) {
+		pipelines[p] = config.pipelines[p].map(pipe => {
+			const cfg = omit(pipe, ["type"]);
 			const func = new PipelineFunction(pipe.type, cfg);
 			func.init();
-
 			return func;
-		}));
-	})
+		});
+	}
 
-	outputs['console'] = new Console();
+	for (const output in config.outputs) {
+		const cfg = omit(config.outputs[output], ["type"]);
+		// @ts-expect-error overloaded config type
+		const out = new OUTPUTS[config.outputs[output].type](cfg);
+		out.init();
+		outputs[output] = out;
+	}
 
-	(config.routes as Route[]).forEach(route => {
+	for (const route of config.routes) {
 		const gen = generators[route.generator];
 		const outputsArray = Array.isArray(route.output) ? route.output : [route.output];
 
 		for (const out of outputsArray) {
 			pipeline(
-				generators[route.generator],
-				// @ts-expect-error Spread operator is expected
+				gen,
+				// @ts-expect-error spread is okay here
 				...(route.pipelines ?? []).flatMap(p => pipelines[p]),
 				outputs[out],
-				() => {}
-			)
+				() => {
+				}
+			);
 		}
-	});
+	}
 }
 
 program
