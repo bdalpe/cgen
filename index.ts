@@ -7,6 +7,7 @@ import {Console} from "./outputs/console";
 import {Interval} from "./generators/interval";
 import {PipelineFunction} from "./functions";
 import {omit} from "es-toolkit";
+const { program } = require('commander');
 
 export interface Event {
 	time: Date;
@@ -43,46 +44,56 @@ export interface Route {
 	output: string | string[];
 }
 
-const generators: Record<string, AbstractGenerator> = {};
-const pipelines: Record<string, PipelineFunction> = {};
-const outputs: Record<string, AbstractOutput> = {};
-const routes: Route[] = [];
+function run(config: Config) {
+	const generators: Record<string, AbstractGenerator> = {};
+	const pipelines: Record<string, PipelineFunction> = {};
+	const outputs: Record<string, AbstractOutput> = {};
+	const routes: Route[] = [];
 
-const file = readFileSync(join(__dirname, "config.yaml"));
+	Object.keys(config.generators).forEach(gen => {
+		const generator = new Interval(config.generators[gen] as BaseGeneratorConfig);
+		generator.init();
+
+		generators[gen] = generator;
+	});
+
+	Object.keys(config.pipelines).forEach(pipeline => {
+		const pipes = config.pipelines[pipeline].map(((pipe, index) => {
+			const c = config.pipelines[pipeline][index];
+			const cfg = omit(c, ["type"]);
+			console.log(cfg)
+
+			const func = new PipelineFunction(pipe.type, cfg);
+			func.init();
+
+			return func;
+		}));
+
+		// chain all functions together using .pipe()
+		pipelines[pipeline] = pipes.reduce((prev, curr) => prev.pipe(curr));
+	})
+
+	outputs['console'] = new Console();
+
+	(config.routes as Route[]).forEach(route => {
+		const gen = generators[route.generator];
+		const outputsArray = Array.isArray(route.output) ? route.output : [route.output];
+
+		const pipeline = Array.prototype.concat(generators[route.generator], route.pipelines?.map(p => pipelines[p]))
+
+		const transformer = pipeline.reduce((prev, curr) => prev.pipe(curr));
+
+		outputsArray.forEach(o => transformer.pipe(outputs[o]));
+	});
+}
+
+program
+	.option('-c, --config <path>', 'Path to the configuration file', 'config.yml')
+	.parse();
+
+const opts = program.opts();
+
+const file = readFileSync(join(__dirname, opts.config));
 const config = load(file.toString()) as Config;
 
-Object.keys(config.generators).forEach(gen => {
-	const generator = new Interval(config.generators[gen] as BaseGeneratorConfig);
-	generator.init();
-
-	generators[gen] = generator;
-});
-
-Object.keys(config.pipelines).forEach(pipeline => {
-	const pipes = config.pipelines[pipeline].map(((pipe, index) => {
-		const c = config.pipelines[pipeline][index];
-		const cfg = omit(c, ["type"]);
-
-		const func = new PipelineFunction(pipe.type, cfg);
-		func.init();
-
-		return func;
-	}));
-
-	// chain all pipelines together using .pipe()
-	pipelines[pipeline] = pipes.reduce((prev, curr) => prev.pipe(curr));
-})
-
-outputs['console'] = new Console();
-
-(config.routes as Route[]).forEach(route => {
-	const gen = generators[route.generator];
-	const outputsArray = Array.isArray(route.output) ? route.output : [route.output];
-
-	const pipeline = Array.prototype.concat(generators[route.generator], route.pipelines?.map(p => pipelines[p]))
-
-	const transformer = pipeline.reduce((prev, curr) => prev.pipe(curr));
-
-	outputsArray.forEach(o => transformer.pipe(outputs[o]));
-});
-
+run(config);
