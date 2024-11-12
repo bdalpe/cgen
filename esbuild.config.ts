@@ -2,7 +2,7 @@ import { build } from "esbuild";
 import { copy } from 'esbuild-plugin-copy';
 
 build({
-  entryPoints: ["index.ts"],
+  entryPoints: ["src/index.ts"],
   bundle: true,
   platform: "node",
   minify: true,

@@ -116,7 +116,7 @@ program
 
 const opts = program.opts();
 
-const file = readFileSync(join(__dirname, opts.config));
+const file = readFileSync(join(process.cwd(), opts.config));
 const config = load(file.toString()) as Config;
 
 run(config);

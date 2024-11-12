@@ -3,9 +3,9 @@
   "version": "0.0.5",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx ./index.ts",
+    "dev": "tsx ./src/index.ts",
     "build": "rm -rf dist && tsx esbuild.config.ts",
-    "test": "vitest --run"
+    "test": "vitest --run src"
   },
   "keywords": [],
   "author": "",
