@@ -61,7 +61,7 @@ Object.keys(config.generators).forEach(gen => {
 Object.keys(config.pipelines).forEach(pipeline => {
 	const pipes = config.pipelines[pipeline].map(((pipe, index) => {
 		const c = config.pipelines[pipeline][index];
-		const cfg = omit(c, "type");
+		const cfg = omit(c, ["type"]);
 
 		const func = new PipelineFunction(pipe.type, cfg);
 		func.init();
