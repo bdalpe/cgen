@@ -14,9 +14,9 @@ ARG TINI_VERSION=v0.19.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static-${TARGETARCH} /tini
 RUN chmod +x /tini
 
-FROM node:bookworm-slim
+FROM gcr.io/distroless/nodejs20-debian12
 COPY --from=builder /tini /tini
 COPY --from=builder /app/dist/ /app/
 
 ENTRYPOINT ["/tini", "--"]
-CMD ["node", "/app/index.js"]
+CMD ["/nodejs/bin/node", "/app/index.js"]
