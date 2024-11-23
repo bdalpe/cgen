@@ -18,8 +18,10 @@ describe('Tcp', () => {
     const mockPort = 8080;
 
     beforeEach(() => {
-        tcp = new Tcp(mockHost, mockPort);
-        vi.clearAllMocks();
+        tcp = new Tcp({
+            host: mockHost,
+            port: mockPort
+        });
     });
 
     afterEach(() => {
@@ -27,8 +29,7 @@ describe('Tcp', () => {
     });
 
     it('should initialize with correct host and port', () => {
-        expect(tcp['host']).toBe(mockHost);
-        expect(tcp['port']).toBe(mockPort);
+        expect(tcp['client'].connect).toHaveBeenCalledWith(expect.objectContaining({host: mockHost, port: mockPort}));
     });
 
     it('should write event data to socket', () => {
