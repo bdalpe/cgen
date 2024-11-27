@@ -109,10 +109,13 @@ function run(config: Config) {
 }
 
 program
-	.option('-c, --config <path>', 'Path to the configuration file', 'config.yml')
+	.option('-c, --config <path>', 'Path to the configuration file', 'config.yaml')
+	.option('-d, --chdir <path>', 'Change the working directory', process.cwd())
 	.parse();
 
 const opts = program.opts();
+
+process.chdir(opts.chdir);
 
 const file = readFileSync(join(process.cwd(), opts.config));
 const config = load(file.toString()) as Config;
