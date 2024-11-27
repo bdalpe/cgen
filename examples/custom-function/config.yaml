@@ -1,0 +1,16 @@
+generators:
+  simple:
+    interval: 1
+    samples:
+      - foo bar baz
+pipelines:
+  custom:
+    - type: custom
+outputs:
+  console:
+    type: console
+routes:
+  - generator: simple
+    pipelines:
+      - custom
+    output: console

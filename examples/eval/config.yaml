@@ -1,0 +1,18 @@
+generators:
+  simple:
+    interval: 1
+    samples:
+      - hello
+pipelines:
+  eval:
+    - type: eval
+      expression: |
+        event.world = "yay"
+outputs:
+  console:
+    type: console
+routes:
+  - generator: simple
+    pipelines:
+      - eval
+    output: console
