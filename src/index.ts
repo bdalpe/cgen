@@ -5,7 +5,7 @@ import {AbstractGenerator, BaseGeneratorConfig} from "./generators";
 import {AbstractOutput} from "./outputs";
 import {Console} from "./outputs/console";
 import {Interval} from "./generators/interval";
-import {PipelineFunction} from "./functions";
+import {FUNCTION, PipelineFunction} from "./functions";
 import {omit} from "es-toolkit";
 import {pipeline} from "node:stream";
 import {program} from 'commander';
@@ -19,7 +19,7 @@ import {Tcp} from "./outputs/tcp";
 
 export interface Event {
 	time: Date;
-	event: string | {};
+	event: string;
 	metadata?: Record<string, unknown>;
 
 	[props: string]: unknown;
@@ -79,9 +79,7 @@ function run(config: Config) {
 	for (const p in config.pipelines) {
 		pipelines[p] = config.pipelines[p].map(pipe => {
 			const cfg = omit(pipe, ["type"]);
-			const func = new PipelineFunction(pipe.type, cfg);
-			func.init();
-			return func;
+			return new PipelineFunction(pipe.type as keyof typeof FUNCTION, cfg);
 		});
 	}
 
