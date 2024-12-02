@@ -5,6 +5,7 @@ import {join} from "path";
 import {existsSync, readFileSync} from "node:fs";
 import {Script} from "node:vm";
 import {isString} from "es-toolkit";
+import * as crypto from "node:crypto";
 
 type TokenProcessorConfig = Record<string, unknown>;
 
@@ -39,6 +40,9 @@ export class CustomFunctionProcessor extends TokenProcessor<CustomFunctionProces
 	protected fn: Function;
 	protected context = {
 		logger: console,
+		Buffer: Buffer,
+		JSON: JSON,
+		crypto: crypto,
 		exports: {} as Record<string, Function>,
 	}
 
