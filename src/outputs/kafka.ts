@@ -13,7 +13,7 @@ export class Kafka extends AbstractOutput {
 		this.client.connect().catch((error: Error) => this.emit('error', error));
 	}
 
-	_write(chunk: any, encoding: BufferEncoding, callback: (error?: (Error | null)) => void): void {
+	_write(chunk: never, encoding: BufferEncoding, callback: (error?: (Error | null)) => void): void {
 		this.client.send({
 			topic: this.config.topic,
 			messages: [

@@ -1,4 +1,4 @@
-import nock, {Body} from 'nock';
+import nock from 'nock';
 import {SplunkHec} from "../splunkhec";
 import { Event } from '../../index';
 import {describe, it, expect, beforeEach, vi} from 'vitest';

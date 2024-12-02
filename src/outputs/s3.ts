@@ -73,6 +73,7 @@ class S3Buffer extends PassThrough {
 export class S3 extends AbstractOutput {
 	protected client: Client;
 	protected buffers: Record<string, S3Buffer> = {};
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 	protected partition: Function;
 
 	constructor(protected readonly config: S3OutputConfig) {

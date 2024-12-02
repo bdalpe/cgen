@@ -1,6 +1,6 @@
 import { Console } from '../console';
 import { Event } from '../../index';
-import {describe, it, expect, beforeEach, vi, Mock, MockedFunction} from 'vitest';
+import {describe, it, expect, beforeEach, vi} from 'vitest';
 
 const encoding: BufferEncoding = 'utf-8';
 const callback = vi.fn();
