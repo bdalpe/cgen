@@ -2,13 +2,13 @@ import {HttpOut} from "./http";
 import {Event} from "../index";
 
 export class SplunkHec extends HttpOut {
-	protected formatEvent(e: Event, encoding: BufferEncoding = 'ascii'): Buffer {
+	protected formatEvent(e: Event): Buffer {
 		// https://docs.splunk.com/Documentation/SplunkCloud/latest/Data/FormateventsforHTTPEventCollector#Event_metadata
 		const {time, event, metadata} = e;
 
 		const {host, source, sourcetype, index, ...rest} = metadata ?? {};
 
-		let payload = {
+		const payload = {
 			time: new Date(time).getTime() / 1000, // Time in milliseconds since epoch
 			host,
 			source,

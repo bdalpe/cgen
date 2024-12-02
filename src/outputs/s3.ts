@@ -96,7 +96,7 @@ export class S3 extends AbstractOutput {
 	/**
 	 * Resolves a partition expression to a string
 	 */
-	resolvePartition(event: any): string {
+	resolvePartition(event: Event): string {
 		return this.partition(event);
 	}
 

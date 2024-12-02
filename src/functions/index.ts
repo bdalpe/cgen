@@ -1,9 +1,5 @@
-import {Script} from "node:vm";
-import {readFileSync} from "node:fs";
-import {join} from "path";
 import {Transform, TransformCallback} from "node:stream";
 import {Event} from "../index";
-import {existsSync} from "node:fs";
 import {
 	CustomFunctionProcessor,
 	Eval,

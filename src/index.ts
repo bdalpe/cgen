@@ -19,7 +19,7 @@ import {Tcp} from "./outputs/tcp";
 
 export interface Event {
 	time: Date;
-	event: string;
+	event: string | Record<string, unknown>;
 	metadata?: Record<string, unknown>;
 
 	[props: string]: unknown;

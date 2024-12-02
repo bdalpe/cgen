@@ -1,4 +1,4 @@
-import {Writable, type WritableOptions} from "node:stream";
+import {Writable} from "node:stream";
 import {type Event} from "../index";
 
 export abstract class AbstractOutput extends Writable {

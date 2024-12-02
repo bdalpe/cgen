@@ -1,6 +1,7 @@
 import {Client} from 'pg';
 import {AbstractOutput} from "./index";
 import {Event} from "../index";
+import {isString} from "es-toolkit";
 
 export interface PostgreSQLConfig extends Record<string, unknown>{
 	connectionString: string;
@@ -39,7 +40,7 @@ export class Postgresql extends AbstractOutput {
 	protected formatEvent(event: Event, encoding: BufferEncoding): Buffer {
 		// convert the KV pairs to a SQL INSERT statement
 		const keys = Object.keys(event.event).map(key => key).join(', ');
-		const vals = Object.values(event.event).map(value => value.toString()).join(', ');
+		const vals = Object.values(event.event).map(value => isString(value) ? value.toString() : JSON.stringify(value)).join(', ');
 
 		return Buffer.from(`INSERT INTO ${this.config.tableName} (${keys}) VALUES (${vals})`, encoding);
 	}

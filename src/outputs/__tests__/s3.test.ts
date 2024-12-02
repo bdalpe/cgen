@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { S3 } from '../s3';
+import {S3, S3OutputConfig} from '../s3';
 import { Client } from 'minio';
 
 vi.mock('minio');
 
 describe('S3 Output', () => {
     let s3: S3;
-    let config: any;
+    let config: S3OutputConfig;
 
     beforeEach(() => {
         config = {
@@ -35,7 +35,7 @@ describe('S3 Output', () => {
     });
 
     it('should resolve partition correctly', () => {
-        const event = { id: 1, message: 'test' };
+        const event = { time: new Date(), event: 'test' };
         const partition = s3.resolvePartition(event);
         expect(partition).toBe('test-partition');
     });
@@ -48,7 +48,7 @@ describe('S3 Output', () => {
 
     it('should flush all buffers', () => {
         const flushMock = vi.fn();
-        s3['buffers']['test-partition'] = { flush: flushMock } as any;
+        s3['buffers']['test-partition'] = { flush: flushMock } as never;
         s3.flushAllBuffers();
         expect(flushMock).toHaveBeenCalled();
     });
@@ -80,7 +80,7 @@ describe('S3 Partition', () => {
     })
 
     it('should resolve partition correctly', () => {
-        const event = { time: new Date(), message: 'test' };
+        const event = { time: new Date(), event: 'test' };
         const partition = s3.resolvePartition(event);
         expect(partition).toBe(`test/${new Date(event.time).getDate().toString()}`);
     });

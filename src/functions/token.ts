@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import {type Event} from "../index";
 import {timeFormat} from "d3-time-format";
 import {join} from "path";
 import {existsSync, readFileSync} from "node:fs";
 import {Script} from "node:vm";
+import {isString} from "es-toolkit";
 
-interface TokenProcessorConfig extends Record<string, unknown> {}
+type TokenProcessorConfig = Record<string, unknown>;
 
 export abstract class TokenProcessor<T extends TokenProcessorConfig> {
 	protected config: T;
@@ -15,7 +17,9 @@ export abstract class TokenProcessor<T extends TokenProcessorConfig> {
 	}
 
 	process(event: Event): Event {
-		event.event = event.event.replaceAll(`{{${this.config.token}}}`, this.nextToken(event));
+		if (isString(event.event)) {
+			event.event = event.event.replaceAll(`{{${this.config.token}}}`, this.nextToken(event));
+		}
 
 		return event;
 	}
@@ -100,9 +104,9 @@ interface RandomHexPickConfig extends TokenProcessorConfig {
 
 export class RandomHexPick extends TokenProcessor<RandomHexPickConfig> {
 	*token(): Generator<string> {
-		let {min: minNum, max: maxNum} = this.config.hex;
-	    let min: number = parseInt(minNum, 16);
-	    let max: number = parseInt(maxNum, 16);
+		const {min: minNum, max: maxNum} = this.config.hex;
+	    const min: number = parseInt(minNum, 16);
+	    const max: number = parseInt(maxNum, 16);
 
 	    while (true) {
 	        yield Math.floor(Math.random() * (max - min + 1) + min).toString(16);

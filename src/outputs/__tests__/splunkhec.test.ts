@@ -8,8 +8,6 @@ const callback = vi.fn();
 
 const checkPayload = (expected: Record<string, unknown>) => {
 	return nock('http://api.example.com').post('/event').reply(204, (_uri, requestBody) => {
-        const payload = JSON.stringify(requestBody);
-
         expect(requestBody).toEqual(expected);
 	});
 }
