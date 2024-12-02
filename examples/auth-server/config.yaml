@@ -1,0 +1,23 @@
+generators:
+  auth:
+    interval: 1
+    samples:
+      - 'auth {{status}} for token: {{jwt}}'
+pipelines:
+  auth:
+    - type: weighted
+      token: status
+      weightedPick:
+        - value: "succeeded"
+          weight: 10
+        - value: "failed"
+          weight: 2
+    - type: jwt  # custom JWT generator function
+outputs:
+  console:
+    type: console
+routes:
+  - generator: auth
+    pipelines:
+      - auth
+    output: console
