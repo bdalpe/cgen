@@ -1,17 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import {type Event} from "../index";
 import {timeFormat} from "d3-time-format";
-import {join} from "path";
+import {join} from "node:path";
 import {existsSync, readFileSync} from "node:fs";
 import {Script} from "node:vm";
 import {isString} from "es-toolkit";
 import * as crypto from "node:crypto";
+import {parse} from "papaparse";
 
 type TokenProcessorConfig = Record<string, unknown>;
 
 export abstract class TokenProcessor<T extends TokenProcessorConfig> {
 	protected config: T;
-	protected generator: Generator<string | number> = this.token();
+	protected generator: Generator<string | number | object | unknown> = this.token();
 
 	constructor(config: T) {
 		this.config = config;
@@ -29,7 +30,7 @@ export abstract class TokenProcessor<T extends TokenProcessorConfig> {
 		return this.generator.next().value;
 	}
 
-	abstract token(): Generator<string | number>;
+	abstract token(): Generator<string | number | object | unknown>;
 }
 
 interface CustomFunctionProcessorConfig extends TokenProcessorConfig {
@@ -190,4 +191,43 @@ export class Eval extends TokenProcessor<EvalConfig> {
 	}
 
 	*token(): Generator<number> {}
+}
+
+interface LookupField {
+	token: string;
+	field?: string;
+}
+
+interface LookupConfig extends TokenProcessorConfig {
+	file: string;
+	fields: LookupField[];
+}
+
+export class Lookup extends TokenProcessor<LookupConfig> {
+	protected lookup: unknown[];
+
+	constructor(config: LookupConfig) {
+		super(config);
+
+		const data = readFileSync(join(process.cwd(), config.file), {encoding: "utf-8"});
+		this.lookup = parse(data, {header: true}).data;
+	}
+
+	process(event: Event): Event {
+		const row = this.generator.next().value;
+
+		if (isString(event.event)) {
+			for (const replacement of this.config.fields) {
+				event.event = event.event.replaceAll(`{{${replacement.token}}}`, row[replacement.field ?? replacement.token]);
+			}
+		}
+
+		return event;
+	}
+
+	*token(): Generator<unknown> {
+		while (true) {
+			yield this.lookup[Math.floor(Math.random() * (this.lookup.length - 1))];
+		}
+	}
 }

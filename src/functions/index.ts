@@ -3,6 +3,7 @@ import {Event} from "../index";
 import {
 	CustomFunctionProcessor,
 	Eval,
+	Lookup,
 	RandomHexPick,
 	RandomIntegerPick,
 	RandomToken,
@@ -16,6 +17,7 @@ export const FUNCTION = {
 	hex: RandomHexPick,
 	weighted: WeightedRandomPick,
 	timestamp: Timestamp,
+	lookup: Lookup,
 	eval: Eval
 } as const;
 

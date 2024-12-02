@@ -1,0 +1,20 @@
+generators:
+  lookup:
+    interval: 1
+    samples:
+      - "{{person}}'s salary is {{salary}}"
+pipelines:
+  lookup:
+    - type: lookup
+      file: example.csv
+      fields:
+        - token: person
+        - token: salary
+outputs:
+  console:
+    type: console
+routes:
+  - generator: lookup
+    pipelines:
+      - lookup
+    output: console
