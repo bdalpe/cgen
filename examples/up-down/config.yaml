@@ -1,0 +1,31 @@
+generators:
+  auth:
+    interval: 1
+    samples:
+      - '{{ts}} {{host}}.example.com is {{status}}'
+pipelines:
+  auth:
+    - type: timestamp
+      token: ts
+      format: "%s"
+    - type: token
+      token: host
+      pickFrom:
+        - auth1
+        - auth2
+        - auth3
+    - type: weighted
+      token: status
+      weightedPick:
+        - value: "up"
+          weight: 10
+        - value: "down"
+          weight: 2
+outputs:
+  console:
+    type: console
+routes:
+  - generator: auth
+    pipelines:
+      - auth
+    output: console
