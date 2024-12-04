@@ -110,7 +110,7 @@ function run(config: Config) {
 
 program
 	.option('-c, --config <path>', 'Path to the configuration file', 'config.yaml')
-	.option('-d, --chdir <path>', 'Change the working directory', process.cwd())
+	.option('-d, --dir <path>', 'Change the working directory', process.cwd())
 	.parse();
 
 const opts = program.opts();
