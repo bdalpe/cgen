@@ -7,7 +7,7 @@ hero:
   text: "An Event Generator"
   actions:
     - theme: brand
-      text: Getting Started
+      text: Documentation
       link: /getting-started
 
 #features:
