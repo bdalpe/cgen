@@ -18,5 +18,4 @@ FROM gcr.io/distroless/nodejs20-debian12
 COPY --from=builder /tini /tini
 COPY --from=builder /app/dist/ /app/
 
-ENTRYPOINT ["/tini", "--"]
-CMD ["/nodejs/bin/node", "/app/index.js"]
+ENTRYPOINT ["/tini", "/nodejs/bin/node", "/app/index.js"]
