@@ -13,14 +13,16 @@ type TokenProcessorConfig = Record<string, unknown>;
 export abstract class TokenProcessor<T extends TokenProcessorConfig> {
 	protected config: T;
 	protected generator: Generator<string | number | object | unknown> = this.token();
+	protected match: RegExp;
 
 	constructor(config: T) {
 		this.config = config;
+		this.match = new RegExp(`{{\\s*${this.config.token}\\s*}}`, 'g')
 	}
 
 	process(event: Event): Event {
 		if (isString(event.event)) {
-			event.event = event.event.replaceAll(`{{${this.config.token}}}`, this.nextToken(event));
+			event.event = event.event.replaceAll(this.match, this.nextToken(event));
 		}
 
 		return event;
