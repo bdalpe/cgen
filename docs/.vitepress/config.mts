@@ -18,6 +18,19 @@ export default defineConfig({
         items: [
           { text: 'Getting Started', link: '/getting-started' },
         ]
+      },
+      {
+        text: 'Using',
+        items: [
+          {
+            text: 'Config File',
+            link: '/config.md'
+          },
+          {
+            text: 'Token Replacement',
+            link: '/pipeline/functions/token.md'
+          }
+        ]
       }
     ],
 
