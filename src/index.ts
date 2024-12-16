@@ -115,7 +115,7 @@ program
 
 const opts = program.opts();
 
-process.chdir(opts.chdir);
+process.chdir(opts.dir);
 
 const file = readFileSync(join(process.cwd(), opts.config));
 const config = load(file.toString()) as Config;
