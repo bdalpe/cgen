@@ -3,6 +3,7 @@ import {Event} from "../index";
 import {
 	CustomFunctionProcessor,
 	Eval,
+	IPAddress,
 	Lookup,
 	RandomHexPick,
 	RandomIntegerPick,
@@ -18,7 +19,8 @@ export const FUNCTION = {
 	weighted: WeightedRandomPick,
 	timestamp: Timestamp,
 	lookup: Lookup,
-	eval: Eval
+	eval: Eval,
+	ipaddr: IPAddress
 } as const;
 
 export class PipelineFunction extends Transform {

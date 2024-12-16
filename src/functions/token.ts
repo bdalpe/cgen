@@ -233,3 +233,47 @@ export class Lookup extends TokenProcessor<LookupConfig> {
 		}
 	}
 }
+
+interface IPAddressConfig extends TokenProcessorConfig {
+	cidr: string;
+}
+
+export class IPAddress extends TokenProcessor<IPAddressConfig> {
+	protected cidr: string;
+
+	constructor(config: IPAddressConfig) {
+		super(config);
+
+		this.cidr = config.cidr;
+	}
+
+	nextToken(_event: Event): string {
+		return this.generateIP();
+	}
+
+	*token(): Generator<string> {
+		while (true) {
+			yield this.generateIP();
+		}
+	}
+
+	protected generateIP(): string {
+		const [ip, mask] = this.cidr.split("/");
+		const maskLength = parseInt(mask);
+		// Calculate the subnet mask as an unsigned 32-bit integer
+		const maskBits = ~((1 << (32 - maskLength)) - 1) >>> 0;
+
+		// Convert the IP to a 32-bit integer
+		const ipNum = ip.split(".").reduce((acc, octet, i) => acc + (parseInt(octet) << (24 - 8 * i)), 0);
+
+		// Calculate the range of IPs within the subnet
+		const baseIP = ipNum & maskBits; // Base network address
+		const hostRange = ~maskBits >>> 0; // Number of host addresses available
+
+		// Generate a random host offset
+		const randomIP = baseIP + Math.floor(Math.random() * hostRange);
+
+		// Convert back to dotted-decimal notation
+		return [24, 16, 8, 0].map(shift => (randomIP >> shift) & 0xff).join(".");
+	}
+}
