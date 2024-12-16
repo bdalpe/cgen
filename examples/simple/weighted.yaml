@@ -1,0 +1,32 @@
+generators:
+  simple:
+    interval: 1
+    samples:
+      - hello, {{world}} {{value}} @ {{ts}}!
+pipelines:
+  tokenizer:
+    - type: weighted
+      token: world
+      weightedPick:
+        - value: world
+          weight: 10
+        - value: you
+          weight: 5
+        - value: there
+          weight: 1
+    - type: int
+      token: value
+      int:
+        min: 1
+        max: 10
+    - type: timestamp
+      token: ts
+      format: "%Y-%m-%d %H:%M:%S"
+outputs:
+  console:
+    type: console
+routes:
+  - generator: simple
+    pipelines:
+      - tokenizer
+    output: console
