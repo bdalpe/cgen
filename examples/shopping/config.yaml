@@ -1,0 +1,104 @@
+generators:
+  shopping:
+    interval: 1
+    samples:
+      - "{{c_ip}} - - [{{timestamp}}] \"{{method}} {{url}} HTTP 1.1\" {{status}} {{size}} \"{{referrer}}\" \"{{user_agent}}\" {{time_taken}}"
+pipelines:
+  shopping:
+    - type: ipaddr
+      token: c_ip
+      cidr: 10.0.0.0/8
+    - type: timestamp
+      token: timestamp
+      format: '%Y/%b/%d:%H:%M:%S'
+    - type: weighted
+      token: method
+      weightedPick:
+        - weight: 10
+          value: GET
+        - weight: 2
+          value: POST
+    - type: weighted
+      token: url
+      weightedPick:
+        - weight: 10
+          value: /cart.do?action={{action}}&itemId={{itemId}}&product_id={{productId}}
+        - weight: 5
+          value: /product.screen?product_id={{productId}}
+        - weight: 2
+          value: /category.screen?category_id={{categoryId}}
+        - weight: 1
+          value: /oldlink?item_id={{itemId}}
+    - type: weighted
+      token: referrer
+      weightedPick:
+        - weight: 3
+          value: http://www.google.com
+        - weight: 3
+          value: http://www.yahoo.com
+        - weight: 2
+          value: http://www.buttercupgames.com/category.screen?categoryId={{categoryId}}
+        - weight: 2
+          value: http://www.buttercupgames.com/product.screen?productId={{productId}}
+        - weight: 1
+          value: http://www.buttercupgames.com/cart.do?action=view
+        - weight: 1
+          value: http://www.buttercupgames.com/oldlink?item_id={{itemId}}
+    - type: weighted
+      token: action
+      weightedPick:
+        - weight: 2
+          value: purchase
+        - weight: 4
+          value: addtocart
+        - weight: 1
+          value: remove
+        - weight: 6
+          value: view
+        - weight: 2
+          value: changequantity
+    - type: lookup
+      file: products.csv
+      fields:
+        - token: productId
+    - type: lookup
+      file: items.csv
+      fields:
+        - token: itemId
+    - type: lookup
+      file: categories.csv
+      fields:
+        - token: categoryId
+    - type: weighted
+      token: status
+      weightedPick:
+       - weight: 10
+         value: "200"
+       - weight: 1
+         value: "503"
+       - weight: 1
+         value: "500"
+       - weight: 6
+         value: "400"
+    - type: lookup
+      file: useragents.csv
+      fields:
+        - token: user_agent
+    - type: int
+      token: size
+      int:
+        min: 400
+        max: 5000
+    - type: int
+      token: time_taken
+      int:
+        min: 1
+        max: 1000
+outputs:
+  console:
+    type: console
+routes:
+  - generator: shopping
+    pipelines:
+      - shopping
+    output: console
