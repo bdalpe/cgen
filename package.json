@@ -28,7 +28,7 @@
     "@types/node": "^22.0.0",
     "@types/papaparse": "^5.3.15",
     "@types/pg": "^8.11.6",
-    "bumpp": "^9.8.1",
+    "bumpp": "^10.0.0",
     "esbuild": "^0.24.0",
     "eslint": "^9.16.0",
     "globals": "^15.13.0",
