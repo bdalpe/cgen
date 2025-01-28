@@ -107,6 +107,7 @@ interface RandomHexPickConfig extends TokenProcessorConfig {
 		min: string;
 		max: string;
 	}
+	pad?: number;
 }
 
 export class RandomHexPick extends TokenProcessor<RandomHexPickConfig> {
@@ -116,7 +117,7 @@ export class RandomHexPick extends TokenProcessor<RandomHexPickConfig> {
 	    const max: number = parseInt(maxNum, 16);
 
 	    while (true) {
-	        yield Math.floor(Math.random() * (max - min + 1) + min).toString(16);
+	        yield Math.floor(Math.random() * (max - min + 1) + min).toString(16).padStart(this.config.pad ?? 0, "0");
 	    }
 	}
 }
