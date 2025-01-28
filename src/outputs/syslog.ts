@@ -8,6 +8,6 @@ export class Syslog extends Tcp {
 
 		const priority = `<${(event.severity as number) * 8 + (event.facility as number)}>`;
 
-		return Buffer.from(`${priority}${event.time.toISOString()} ${event.metadata?.host ?? 'cgen'} ${event.event}`);
+		return Buffer.from(`${priority}${event.time.toISOString()} ${event.metadata?.host ?? 'cgen'} ${event.event}\n`);
 	}
 }
