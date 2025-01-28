@@ -1,18 +1,23 @@
 import {AbstractGenerator, type BaseGeneratorConfig} from "../index";
 
 export class Interval extends AbstractGenerator {
+	private intervalId: NodeJS.Timeout | null = null;
+
 	constructor(protected config: BaseGeneratorConfig) {
 		super(config);
 	}
 
 	async init(): Promise<void> {
-		setInterval(() => {
+		this.intervalId = setInterval(() => {
 			this.generate();
 		}, this.config.interval * 1000);
 	}
 
 	async unload(): Promise<void> {
-		clearInterval(this.config.interval);
+		if (this.intervalId) {
+			clearInterval(this.intervalId);
+			this.intervalId = null;
+		}
 		await super.unload();
 	}
 
