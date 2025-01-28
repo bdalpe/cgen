@@ -157,18 +157,22 @@ export class WeightedRandomPick extends TokenProcessor<WeightedRandomPickConfig>
 
 interface TimestampConfig extends TokenProcessorConfig {
 	format: string;
+	offset?: number;
 }
 
 export class Timestamp extends TokenProcessor<TimestampConfig> {
 	protected ts: (date: Date) => string;
+	protected offset: number;
 
 	constructor(config: TimestampConfig) {
 		super(config);
-
+		this.offset = config.offset ?? 0;
 		this.ts = timeFormat(this.config.format);
 	}
 
 	nextToken(event: Event): string {
+		event.time.setTime(event.time.getTime() + this.offset);
+
 		return this.ts(event.time);
 	}
 
