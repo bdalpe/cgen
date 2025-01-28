@@ -66,7 +66,6 @@ const OUTPUTS = {
 
 function run(config: Config) {
 	const generators: Record<string, AbstractGenerator> = {};
-	const pipelines: Record<string, PipelineFunction[]> = {};
 	const outputs: Record<string, AbstractOutput> = {};
 
 	for (const gen in config.generators) {
@@ -76,8 +75,8 @@ function run(config: Config) {
 		generators[gen] = generator;
 	}
 
-	for (const p in config.pipelines) {
-		pipelines[p] = config.pipelines[p].map(pipe => {
+	function initPipeline(p: string): PipelineFunction[] {
+		return config.pipelines[p].map(pipe => {
 			const cfg = omit(pipe, ["type"]);
 			return new PipelineFunction(pipe.type as keyof typeof FUNCTION, cfg);
 		});
@@ -99,7 +98,7 @@ function run(config: Config) {
 			pipeline(
 				gen,
 				// @ts-expect-error spread is okay here
-				...(route.pipelines ?? []).flatMap(p => pipelines[p]),
+				...(route.pipelines ?? []).flatMap(p => initPipeline(p)),
 				outputs[out],
 				() => {
 				}
