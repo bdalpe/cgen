@@ -48,4 +48,9 @@ export class PipelineFunction extends Transform {
 
 		callback();
 	}
+
+	_destroy(error: Error | null, callback: (error?: (Error | null)) => void) {
+		this.removeAllListeners();
+		callback(error);
+	}
 }
