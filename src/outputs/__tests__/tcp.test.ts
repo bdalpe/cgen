@@ -8,7 +8,11 @@ vi.mock('node:net', () => ({
         connect: vi.fn().mockReturnThis(),
         on: vi.fn(),
         write: vi.fn(),
-        end: vi.fn()
+        end: vi.fn(),
+        destroy: vi.fn(),
+        removeAllListeners: vi.fn(),
+        writable: true,
+        destroyed: false
     }))
 }));
 

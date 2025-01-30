@@ -7,7 +7,9 @@ vi.mock('node:net', () => ({
         connect: vi.fn().mockReturnThis(),
         on: vi.fn(),
         write: vi.fn(),
-        end: vi.fn()
+        end: vi.fn(),
+        destroy: vi.fn(),
+        removeAllListeners: vi.fn()
     }))
 }));
 
@@ -22,7 +24,7 @@ describe('Syslog', () => {
         const formattedEvent = syslog['formatEvent'](event);
 
         const expectedPriority = `<${6 * 8 + 1}>`;
-        const expectedMessage = Buffer.from(`${expectedPriority}${event.time.toISOString()} cgen ${event.event}`);
+        const expectedMessage = Buffer.from(`${expectedPriority}${event.time.toISOString()} cgen ${event.event}\n`);
 
         expect(formattedEvent).toStrictEqual(expectedMessage);
     });
@@ -43,7 +45,7 @@ describe('Syslog', () => {
         events.forEach(event => {
             const formattedEvent = syslog['formatEvent'](event);
             const expectedPriority = `<${6 * 8 + 1}>`;
-            const expectedMessage = Buffer.from(`${expectedPriority}${event.time.toISOString()} cgen ${event.event}`);
+            const expectedMessage = Buffer.from(`${expectedPriority}${event.time.toISOString()} cgen ${event.event}\n`);
             expect(formattedEvent).toStrictEqual(expectedMessage);
         });
     });
