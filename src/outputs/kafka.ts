@@ -1,4 +1,4 @@
-import {Kafka as KafkaJS, KafkaConfig, Producer} from 'kafkajs';
+import {Kafka as KafkaJS, KafkaConfig, Partitioners, Producer} from 'kafkajs';
 import {AbstractOutput} from "./index";
 
 export class Kafka extends AbstractOutput {
@@ -8,7 +8,7 @@ export class Kafka extends AbstractOutput {
 		super();
 
 		const kjs = new KafkaJS(config.config);
-		this.client = kjs.producer()
+		this.client = kjs.producer({createPartitioner: Partitioners.DefaultPartitioner})
 
 		this.client.connect().catch((error: Error) => this.emit('error', error));
 	}
