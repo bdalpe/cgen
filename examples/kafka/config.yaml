@@ -1,0 +1,15 @@
+generators:
+  simple:
+    interval: 1
+    samples:
+      - hello, world!
+outputs:
+  kafka:
+    type: kafka
+    config:
+      brokers: ["localhost:19092"]
+      clientId: "cgen"
+    topic: test
+routes:
+  - generator: simple
+    output: kafka
