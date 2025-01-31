@@ -16,6 +16,7 @@ import {S3} from "./outputs/s3";
 import {SplunkHec} from "./outputs/splunkhec";
 import {Syslog} from "./outputs/syslog";
 import {Tcp} from "./outputs/tcp";
+import {Kafka} from "./outputs/kafka";
 
 export interface Event {
 	time: Date;
@@ -61,7 +62,8 @@ const OUTPUTS = {
 	s3: S3,
 	hec: SplunkHec,
 	syslog: Syslog,
-	tcp: Tcp
+	tcp: Tcp,
+	kafka: Kafka
 } as const;
 
 function run(config: Config) {
