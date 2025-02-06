@@ -3,6 +3,7 @@ import {AbstractOutput} from "./index";
 import {PassThrough} from "node:stream";
 import {Event} from "../index";
 import {Script} from "node:vm";
+import {join} from "node:path";
 
 export interface S3OutputConfig extends Record<string, unknown> {
 	/**
@@ -31,22 +32,28 @@ export interface S3OutputConfig extends Record<string, unknown> {
 	s3config: ClientOptions;
 }
 
+function generateRandomString(length = 6): string {
+	const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	return Array.from({length}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+
 /**
  * Internal class to buffer events in memory until they are ready to be uploaded to S3.
  */
 class S3Buffer extends PassThrough {
 	protected timer: NodeJS.Timeout;
 
-	constructor(protected readonly client: Client, protected readonly config: S3OutputConfig) {
-		super({objectMode: true});
+	constructor(protected readonly client: Client, protected readonly partition: string, protected readonly config: S3OutputConfig) {
+		super();
 
-		this.timer = setInterval(() => this.flush(() => {}), this.config.flushInterval);
+		this.timer = setInterval(async () => this.flush(() => {}), this.config.flushInterval);
 	}
 
-	_write(event: Event, encoding: BufferEncoding, callback: (error?: (Error | null)) => void) {
+	_write(event: Buffer, encoding: BufferEncoding, callback: (error?: (Error | null)) => void) {
 		this.push(event, encoding);
 
-		if (this.writableLength > this.config.spoolSize) {
+		if (this.readableLength > this.config.spoolSize) {
+			this.timer.refresh();
 			this.flush(callback);
 		}
 
@@ -54,8 +61,14 @@ class S3Buffer extends PassThrough {
 	}
 
 	flush(callback: (error?: (Error | null)) => void) {
-		this.client.putObject(this.config.bucket, this.config.partition, this)
+		const objName = join(this.partition, `cgen-${generateRandomString()}.raw`);
+
+		if (this.readableLength == 0) return;
+
+		this.end();
+		this.client.putObject(this.config.bucket, objName, this)
 			.then(() => {
+				console.log("Flushed buffer to S3:", objName);
 				callback();
 			})
 			.catch((error: Error) => {
@@ -87,11 +100,16 @@ export class S3 extends AbstractOutput {
 	_write(event: Event, encoding: BufferEncoding, callback: (error?: (Error | null)) => void) {
 		const partition = this.resolvePartition(event);
 
-		if (!this.buffers[partition]) {
-			this.buffers[partition] = new S3Buffer(this.client, this.config);
+		if (!this.buffers[partition] || !this.buffers[partition].writable) {
+			this.buffers[partition] = new S3Buffer(this.client, partition, this.config);
+
+			// Garbage collection
+			this.buffers[partition].on('close', () => {
+				delete this.buffers[partition];
+			});
 		}
 
-		this.buffers[partition].write(event, encoding, callback);
+		this.buffers[partition].write(this.formatEvent(event), encoding, callback);
 	}
 
 	/**

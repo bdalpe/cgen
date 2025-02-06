@@ -60,7 +60,7 @@ describe('S3 Output', () => {
         s3.write(event, 'utf-8', () => {});
         s3['buffers']['test-partition'].flush(() => {});
         expect(putObjectMock).toHaveBeenCalled();
-        expect(putObjectMock).toHaveBeenCalledWith('test-bucket', 'test-partition', s3['buffers']['test-partition']);
+        expect(putObjectMock).toHaveBeenCalledWith('test-bucket', expect.stringMatching(/test-partition\/cgen-[a-zA-Z0-9]{6}.raw/), s3['buffers']['test-partition']);
     });
 });
 
