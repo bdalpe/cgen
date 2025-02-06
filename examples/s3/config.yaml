@@ -1,0 +1,22 @@
+generators:
+  simple:
+    interval: .1
+    samples:
+      - hello, world!
+outputs:
+  s3:
+    type: s3
+    bucket: "bucket"
+    region: "us-east-1"
+    spoolSize: 25000  # 2.5MB
+    flushInterval: 3600000 # 60 minutes
+    partition: "year=${new Date(event.time).getFullYear()}/month=${new Date(event.time).getMonth() + 1}/day=${new Date(event.time).getDate()}/minute=${new Date(event.time).getMinutes()}"
+    s3config:
+      endPoint: localhost
+      port: 9000
+      useSSL: false
+      accessKey: minioadmin
+      secretKey: minioadmin
+routes:
+  - generator: simple
+    output: s3
