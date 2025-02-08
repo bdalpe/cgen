@@ -29,7 +29,7 @@
     "@types/papaparse": "^5.3.15",
     "@types/pg": "^8.11.6",
     "bumpp": "^10.0.0",
-    "esbuild": "^0.24.0",
+    "esbuild": "^0.25.0",
     "eslint": "^9.16.0",
     "globals": "^15.13.0",
     "nock": "^14.0.0",
