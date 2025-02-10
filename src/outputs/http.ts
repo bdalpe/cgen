@@ -2,8 +2,10 @@ import {AbstractOutput} from "./index";
 import {Event} from "../index";
 import {Agent, request} from 'node:http'
 
-interface HttpOutConfig {
+export interface HttpOutConfig {
 	endpoint: string;
+
+	headers?: Record<string, string>;
 }
 
 /**
@@ -12,11 +14,14 @@ interface HttpOutConfig {
 export class HttpOut extends AbstractOutput {
 	protected endpoint: URL;
 	protected http: Agent;
+	protected headers?: Record<string, string>;
 
 	constructor(config: HttpOutConfig) {
 		super();
 
 		this.endpoint = new URL(config.endpoint);
+
+		this.headers = config.headers;
 
 		this.http = new Agent({
 			keepAlive: false
@@ -32,7 +37,8 @@ export class HttpOut extends AbstractOutput {
 				agent: this.http,
 				method: 'POST',
 				headers: {
-					'Content-Type': 'application/json'
+					'Content-Type': 'application/json',
+					...this.headers
 				}
 			},
 			(res) => {

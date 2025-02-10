@@ -12,7 +12,6 @@ const checkPayload = (expected: Record<string, unknown>) => {
 	});
 }
 
-
 describe('Splunk HEC', () => {
     let splunkHec: SplunkHec;
 
@@ -47,4 +46,25 @@ describe('Splunk HEC', () => {
         splunkHec._write(event, encoding, callback);
 		expect(callback).toHaveBeenCalled();
     });
+
+	it('sends the correct authorization header', async () => {
+		const config = { endpoint: 'http://api.example.com/event', authToken: 'token' };
+		splunkHec = new SplunkHec(config);
+
+		const event: Event = {
+			time: new Date(),
+	        event: 'sample data',
+	        metadata: {
+				index: 'goat',
+				sourcetype: 'goat',
+		        extra: true
+			}
+		};
+
+		// check that the authorization header is set
+		expect(splunkHec['headers']).toEqual(expect.objectContaining({'Authorization': 'Splunk token'}));
+
+		splunkHec._write(event, encoding, callback);
+		expect(callback).toHaveBeenCalled();
+	});
 });
