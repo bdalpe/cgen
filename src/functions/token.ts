@@ -190,11 +190,13 @@ export class Eval extends TokenProcessor<EvalConfig> {
 	constructor(config: EvalConfig) {
 		super(config);
 
-		this.expression = new Function("event", this.config.expression);
+		this.expression = new Function("event", `${this.config.expression}; return event;`);
 	}
 
-	nextToken(event: Event): string {
-		return this.expression(event);
+	process(event: Event): Event {
+		event = this.expression(event);
+
+		return event;
 	}
 
 	*token(): Generator<number> {}
