@@ -4,9 +4,10 @@ import {timeFormat} from "d3-time-format";
 import {join} from "node:path";
 import {existsSync, readFileSync} from "node:fs";
 import {Script} from "node:vm";
-import {isString} from "es-toolkit";
+import {isPlainObject, isString} from "es-toolkit";
 import * as crypto from "node:crypto";
 import {parse} from "papaparse";
+import {isObjectLike} from "es-toolkit/compat";
 
 type TokenProcessorConfig = Record<string, unknown>;
 
@@ -20,9 +21,24 @@ export abstract class TokenProcessor<T extends TokenProcessorConfig> {
 		this.match = new RegExp(`{{\\s*${this.config.token}\\s*}}`, 'g')
 	}
 
+	private nestedReplace(obj: Record<string, unknown>, val: string) {
+		for (const [key, value] of Object.entries(obj)) {
+			if (isString(value)) {
+				obj[key] = value.replaceAll(this.match, val);
+			} else if (isObjectLike(value)) {
+				this.nestedReplace(value as Record<string, unknown>, val);
+			}
+		}
+	}
+
 	process(event: Event): Event {
 		if (isString(event.event)) {
 			event.event = event.event.replaceAll(this.match, this.nextToken(event));
+		}
+
+		if (isPlainObject(event.event)) {
+			// Recurse through nested objects and replace all tokens
+			this.nestedReplace(event.event, this.nextToken(event));
 		}
 
 		return event;
