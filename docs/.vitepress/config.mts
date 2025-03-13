@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import {generateSidebar} from "vitepress-sidebar";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -24,13 +25,27 @@ export default defineConfig({
         items: [
           {
             text: 'Config File',
-            link: '/config.md'
+            link: '/config'
+          },
+          {
+            text: 'Generators',
+            link: '/config/generator'
           },
           {
             text: 'Token Replacement',
-            link: '/pipeline/functions/token.md'
+            link: '/config/token'
           }
         ]
+      },
+      {
+        text: 'Replacement Functions',
+        base: '/config/pipeline/functions/',
+        items: generateSidebar({
+          scanStartPath: 'config/pipeline/functions',
+          excludePattern: ['token.md'],
+          useTitleFromFileHeading: true,
+          useTitleFromFrontmatter: true,
+        })
       }
     ],
 

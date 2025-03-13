@@ -7,7 +7,7 @@ Usage: index [options]
 
 Options:
   -c, --config <path>  Path to the configuration file (default: "config.yaml")
-  -d, --dir <path>   Change the working directory (default: "/")
+  -d, --dir <path>     Change the working directory (default: "/")
   -h, --help           display help for command
 ```
 
