@@ -3,18 +3,31 @@ import { Tcp } from '../tcp';
 
 const callback = vi.fn();
 
-vi.mock('node:net', () => ({
-    Socket: vi.fn().mockImplementation(() => ({
-        connect: vi.fn().mockReturnThis(),
-        on: vi.fn(),
-        write: vi.fn(),
-        end: vi.fn(),
-        destroy: vi.fn(),
-        removeAllListeners: vi.fn(),
-        writable: true,
-        destroyed: false
-    }))
-}));
+vi.mock('node:net', () => {
+	class Socket {
+		connect: ReturnType<typeof vi.fn>;
+		on: ReturnType<typeof vi.fn>;
+		write: ReturnType<typeof vi.fn>;
+		end: ReturnType<typeof vi.fn>;
+		destroy: ReturnType<typeof vi.fn>;
+		removeAllListeners: ReturnType<typeof vi.fn>;
+		writable: boolean;
+		destroyed: boolean;
+
+		constructor () {
+			this.connect = vi.fn().mockReturnThis();
+			this.on = vi.fn();
+			this.write = vi.fn();
+			this.end = vi.fn();
+			this.destroy = vi.fn();
+			this.removeAllListeners = vi.fn();
+			this.writable = true;
+			this.destroyed = false;
+		}
+	}
+
+	return {Socket};
+});
 
 describe('Tcp', () => {
     let tcp: Tcp;
