@@ -61,6 +61,8 @@ describe('Splunk HEC', () => {
 			}
 		};
 
+		checkPayload(expect.objectContaining({sourcetype: 'goat', index: 'goat', fields: {extra: true}}))
+
 		// check that the authorization header is set
 		expect(splunkHec['headers']).toEqual(expect.objectContaining({'Authorization': 'Splunk token'}));
 
