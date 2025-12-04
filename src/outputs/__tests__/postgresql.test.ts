@@ -3,15 +3,19 @@ import {Event} from "../../index";
 import {describe, vi, test, expect} from "vitest";
 
 vi.mock('pg', () => {
-	return {
-		Client: vi.fn().mockImplementation(() => {
-			return {
-				connect: vi.fn(),
-				query: vi.fn(),
-				on: vi.fn(),
-			};
-		}),
-	};
+	class Client {
+		connect: ReturnType<typeof vi.fn>;
+		query: ReturnType<typeof vi.fn>;
+		on: ReturnType<typeof vi.fn>;
+
+		constructor() {
+			this.connect = vi.fn();
+			this.query = vi.fn();
+			this.on = vi.fn();
+		}
+	}
+
+	return {Client};
 });
 
 const newEvent = function (event: Event["event"]) {
