@@ -17,6 +17,7 @@ import {SplunkHec} from "./outputs/splunkhec";
 import {Syslog} from "./outputs/syslog";
 import {Tcp} from "./outputs/tcp";
 import {Kafka} from "./outputs/kafka";
+import {PrometheusRemoteWrite} from "./outputs/prometheusremotewrite";
 
 export interface Event {
 	time: Date;
@@ -63,7 +64,8 @@ const OUTPUTS = {
 	hec: SplunkHec,
 	syslog: Syslog,
 	tcp: Tcp,
-	kafka: Kafka
+	kafka: Kafka,
+	prometheusremotewrite: PrometheusRemoteWrite
 } as const;
 
 function run(config: Config) {
