@@ -6,6 +6,8 @@ The config file is written in YAML and is separated into 4 sections:
 * `outputs`
 * `routes`
 
+See [Outputs](/config/output/) for the supported output types and their settings.
+
 ## Example Config File
 
 The following YAML shows a fully functional config file with a simple generator, a pipeline that randomly picks a replacement for the "hello, world" statement, and then writes to the console.
