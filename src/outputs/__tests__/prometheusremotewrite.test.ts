@@ -36,10 +36,14 @@ resolve();
 });
 });
 
-expect(pushMetrics).toHaveBeenCalledWith(
-{queue_depth_total: 100},
-{url: "http://localhost:9201", labels: {service: "queue-worker"}}
-);
+	expect(pushMetrics).toHaveBeenCalledWith(
+		{queue_depth_total: 100},
+		expect.objectContaining({
+			url: "http://localhost:9201",
+			labels: {service: "queue-worker"},
+			fetch: expect.any(Function)
+		})
+	);
 expect(pushTimeseries).not.toHaveBeenCalled();
 });
 
@@ -70,7 +74,13 @@ resolve();
 });
 });
 
-expect(pushTimeseries).toHaveBeenCalledWith(event.event, {url: "http://localhost:9201"});
+	expect(pushTimeseries).toHaveBeenCalledWith(
+		event.event,
+		expect.objectContaining({
+			url: "http://localhost:9201",
+			fetch: expect.any(Function)
+		})
+	);
 expect(pushMetrics).not.toHaveBeenCalled();
 });
 

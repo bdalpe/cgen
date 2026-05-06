@@ -15,6 +15,16 @@ timestamp?: number;
 }>;
 };
 
+type RemoteWriteFetch = (
+url: string,
+init?: {
+method: string;
+headers: Record<string, string>;
+timeout?: number;
+body: ArrayBufferLike;
+}
+) => Promise<{status: number; statusText: string; text: () => Promise<string>}>;
+
 export interface PrometheusRemoteWriteConfig {
 url: string;
 auth?: {
@@ -25,6 +35,7 @@ labels?: Record<string, string>;
 headers?: Record<string, string>;
 timeout?: number;
 mode?: "metrics" | "timeseries";
+fetch?: RemoteWriteFetch;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -36,7 +47,7 @@ if (!isRecord(value)) {
 return false;
 }
 
-return Object.values(value).every((v): v is number => typeof v === "number" && Number.isFinite(v));
+return Object.values(value).every(v => typeof v === "number" && Number.isFinite(v));
 }
 
 function isTimeseries(value: unknown): value is Timeseries {
@@ -55,6 +66,20 @@ function isTimeseriesPayload(value: unknown): value is Timeseries | Timeseries[]
 return Array.isArray(value) ? value.every(isTimeseries) : isTimeseries(value);
 }
 
+const defaultFetch: RemoteWriteFetch = async (url, init) => {
+const response = await fetch(url, {
+method: init?.method,
+headers: init?.headers,
+body: init?.body as BodyInit
+});
+
+return {
+status: response.status,
+statusText: response.statusText,
+text: () => response.text()
+};
+};
+
 /**
  * Writes events to a Prometheus remote_write endpoint.
  */
@@ -64,7 +89,8 @@ super();
 }
 
 _write(event: Event, _encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
-const {mode = "metrics", ...options} = this.config;
+const {mode = "metrics", ...cfg} = this.config;
+const options = {...cfg, fetch: cfg.fetch ?? defaultFetch};
 const payload = event.event;
 
 const write = mode === "timeseries"
