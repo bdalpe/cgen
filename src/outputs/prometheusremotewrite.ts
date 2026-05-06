@@ -25,7 +25,7 @@ type RemoteWriteFetch = (
 	}
 ) => Promise<{ status: number; statusText: string; text: () => Promise<string> }>;
 
-export interface PrometheusRemoteWriteConfig {
+export interface PrometheusRemoteWriteConfig extends Record<string, unknown> {
 	url: string;
 	auth?: {
 		username?: string;
