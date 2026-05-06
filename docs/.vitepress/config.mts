@@ -32,6 +32,10 @@ export default defineConfig({
             link: '/config/generator'
           },
           {
+            text: 'Outputs',
+            link: '/config/output'
+          },
+          {
             text: 'Token Replacement',
             link: '/config/token'
           }
