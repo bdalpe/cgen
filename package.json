@@ -19,7 +19,8 @@
     "minio": "^8.0.0",
     "papaparse": "^5.4.1",
     "pg": "^8.12.0",
-    "pg-cloudflare": "^1.1.1"
+    "pg-cloudflare": "^1.1.1",
+    "prometheus-remote-write": "^0.5.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",
