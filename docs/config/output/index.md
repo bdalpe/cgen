@@ -56,12 +56,16 @@ Writes each full event as JSON to a local file.
 Options:
 
 * `fileName` - Path to the destination file
+* `maxFileSize` - Optional maximum file size in bytes before rotation (defaults to 1 MiB)
+* `maxFiles` - Optional number of rotated files to retain (defaults to 5)
 
 ```yaml
 outputs:
   events_file:
     type: file
     fileName: events.log
+    maxFileSize: 1048576
+    maxFiles: 5
 ```
 
 ## http
