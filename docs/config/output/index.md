@@ -106,7 +106,7 @@ outputs:
         - localhost:19092
 ```
 
-## postgres
+## postgresql
 
 Converts `event.event` key/value pairs into an `INSERT` statement for a table.
 
@@ -120,7 +120,7 @@ Options:
 ```yaml
 outputs:
   db:
-    type: postgres
+    type: postgresql
     connectionString: postgresql://postgres:postgres@localhost:5432/events
     tableName: generated_events
 ```

@@ -1,7 +1,6 @@
 import {Client} from 'pg';
 import {AbstractOutput} from "./index";
 import {Event} from "../index";
-import {isString} from "es-toolkit";
 
 export interface PostgreSQLConfig extends Record<string, unknown>{
 	connectionString: string;
@@ -22,7 +21,8 @@ export interface PostgreSQLConfig extends Record<string, unknown>{
  *     }
  * }
  * becomes
- * INSERT INTO <table> (foo, baz) VALUES ("bar", true);
+ * INSERT INTO "<table>" ("foo", "baz") VALUES ($1, $2);
+ * with ["bar", true] passed separately as parameters.
  */
 export class Postgresql extends AbstractOutput {
 	protected readonly client: Client;
@@ -37,16 +37,34 @@ export class Postgresql extends AbstractOutput {
 		this.client.on('error', (error: Error) => this.emit('error', error));
 	}
 
-	protected formatEvent(event: Event, encoding: BufferEncoding): Buffer {
-		// convert the KV pairs to a SQL INSERT statement
-		const keys = Object.keys(event.event).map(key => key).join(', ');
-		const vals = Object.values(event.event).map(value => isString(value) ? value.toString() : JSON.stringify(value)).join(', ');
+	async init(): Promise<void> {
+		await this.client.connect();
+	}
 
-		return Buffer.from(`INSERT INTO ${this.config.tableName} (${keys}) VALUES (${vals})`, encoding);
+	async unload(): Promise<void> {
+		await this.client.end();
+	}
+
+	private quoteIdentifier(identifier: string): string {
+		return `"${identifier.replaceAll('"', '""')}"`;
+	}
+
+	private quoteTableName(tableName: string): string {
+		return tableName.split('.').map(part => this.quoteIdentifier(part)).join('.');
+	}
+
+	protected formatEvent(event: Event, encoding: BufferEncoding): Buffer {
+		const keys = Object.keys(event.event).map(key => this.quoteIdentifier(key)).join(', ');
+		const placeholders = Object.keys(event.event).map((_, index) => `$${index + 1}`).join(', ');
+
+		return Buffer.from(
+			`INSERT INTO ${this.quoteTableName(this.config.tableName)} (${keys}) VALUES (${placeholders})`,
+			encoding
+		);
 	}
 
 	_write(event: Event, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
-		this.client.query(this.formatEvent(event, encoding).toString())
+		this.client.query(this.formatEvent(event, encoding).toString(), Object.values(event.event))
 			.then(() => callback())
 			.catch((error: Error | null) => callback(error));
 	}

@@ -60,7 +60,7 @@ const OUTPUTS = {
 	console: Console,
 	devnull: Devnull,
 	http: HttpOut,
-	postgres: Postgresql,
+	postgresql: Postgresql,
 	s3: S3,
 	hec: SplunkHec,
 	syslog: Syslog,
