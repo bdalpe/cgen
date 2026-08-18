@@ -49,6 +49,21 @@ outputs:
     type: devnull
 ```
 
+## file
+
+Writes each full event as JSON to a local file.
+
+Options:
+
+* `fileName` - Path to the destination file
+
+```yaml
+outputs:
+  events_file:
+    type: file
+    fileName: events.log
+```
+
 ## http
 
 Sends each event to an HTTP endpoint with `POST` and `application/json`.
