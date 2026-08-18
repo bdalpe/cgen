@@ -18,6 +18,7 @@ import {Syslog} from "./outputs/syslog";
 import {Tcp} from "./outputs/tcp";
 import {Kafka} from "./outputs/kafka";
 import {PrometheusRemoteWrite} from "./outputs/prometheusremotewrite";
+import {File} from "./outputs/file";
 
 export interface Event {
 	time: Date;
@@ -65,7 +66,8 @@ const OUTPUTS = {
 	syslog: Syslog,
 	tcp: Tcp,
 	kafka: Kafka,
-	prometheusremotewrite: PrometheusRemoteWrite
+	prometheusremotewrite: PrometheusRemoteWrite,
+	file: File
 } as const;
 
 function run(config: Config) {
