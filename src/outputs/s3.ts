@@ -1,4 +1,4 @@
-import {Client, ClientOptions} from 'minio';
+import {PutObjectCommand, S3Client, S3ClientConfig} from '@aws-sdk/client-s3';
 import {AbstractOutput} from "./index";
 import {PassThrough} from "node:stream";
 import {Event} from "../index";
@@ -29,7 +29,7 @@ export interface S3OutputConfig extends Record<string, unknown> {
 	/**
 	 * The configuration for the S3 client.
 	 */
-	s3config: ClientOptions;
+	s3config: S3ClientConfig;
 }
 
 function generateRandomString(length = 6): string {
@@ -43,7 +43,7 @@ function generateRandomString(length = 6): string {
 class S3Buffer extends PassThrough {
 	protected timer: NodeJS.Timeout;
 
-	constructor(protected readonly client: Client, protected readonly partition: string, protected readonly config: S3OutputConfig) {
+	constructor(protected readonly client: S3Client, protected readonly partition: string, protected readonly config: S3OutputConfig) {
 		super();
 
 		this.timer = setInterval(async () => this.flush(() => {}), this.config.flushInterval);
@@ -66,7 +66,13 @@ class S3Buffer extends PassThrough {
 		if (this.readableLength == 0) return;
 
 		this.end();
-		this.client.putObject(this.config.bucket, objName, this)
+		this.client.send(
+				new PutObjectCommand({
+					Bucket: this.config.bucket,
+					Key: objName,
+					Body: this
+				})
+			)
 			.then(() => {
 				console.log("Flushed buffer to S3:", objName);
 				callback();
@@ -84,7 +90,7 @@ class S3Buffer extends PassThrough {
  * at which point it will be uploaded to the S3 bucket.
  */
 export class S3 extends AbstractOutput {
-	protected client: Client;
+	protected client: S3Client;
 	protected buffers: Record<string, S3Buffer> = {};
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 	protected partition: Function;
@@ -92,7 +98,7 @@ export class S3 extends AbstractOutput {
 	constructor(protected readonly config: S3OutputConfig) {
 		super();
 
-		this.client = new Client(config.s3config);
+		this.client = new S3Client(config.s3config);
 
 		this.partition = new Script(`(function (event) { return \`${config.partition}\`; })`).runInNewContext();
 	}

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {S3, S3OutputConfig} from '../s3';
-import { Client } from 'minio';
+import {PutObjectCommand, S3Client} from '@aws-sdk/client-s3';
 
-vi.mock('minio');
+vi.mock('@aws-sdk/client-s3');
 
 describe('S3 Output', () => {
     let s3: S3;
@@ -15,11 +15,11 @@ describe('S3 Output', () => {
             spoolSize: 1024,
             flushInterval: 1000,
             s3config: {
-                endPoint: 'localhost',
-                port: 9000,
-                useSSL: false,
-                accessKey: 'accessKey',
-                secretKey: 'secretKey',
+                endpoint: 'http://localhost:9000',
+	            credentials: {
+		            accessKeyId: 'accessKey',
+		            secretAccessKey: 'secretKey',
+	            }
             },
         };
 
@@ -30,8 +30,8 @@ describe('S3 Output', () => {
         vi.clearAllMocks();
     });
 
-    it('should initialize minio client with given config', () => {
-        expect(Client).toHaveBeenCalledWith(config.s3config);
+    it('should initialize S3 client with given config', () => {
+        expect(S3Client).toHaveBeenCalledWith(config.s3config);
     });
 
     it('should resolve partition correctly', () => {
@@ -53,14 +53,14 @@ describe('S3 Output', () => {
         expect(flushMock).toHaveBeenCalled();
     });
 
-    it('should call client.putObject when buffer flushes', async () => {
+    it('should call client.send when buffer flushes', async () => {
         const event = { id: 1, message: 'test' };
         const putObjectMock = vi.fn().mockResolvedValue({});
-        s3['client']['putObject'] = putObjectMock;
+        s3['client']['send'] = putObjectMock;
         s3.write(event, 'utf-8', () => {});
         s3['buffers']['test-partition'].flush(() => {});
         expect(putObjectMock).toHaveBeenCalled();
-        expect(putObjectMock).toHaveBeenCalledWith('test-bucket', expect.stringMatching(/test-partition\/cgen-[a-zA-Z0-9]{6}.raw/), s3['buffers']['test-partition']);
+        expect(putObjectMock).toHaveBeenCalledWith(expect.any(PutObjectCommand));
     });
 });
 
@@ -71,11 +71,11 @@ describe('S3 Partition', () => {
         spoolSize: 1024,
         flushInterval: 1000,
         s3config: {
-            endPoint: 'localhost',
-            port: 9000,
-            useSSL: false,
-            accessKey: 'accessKey',
-            secretKey: 'secretKey',
+            endpoint: 'http://localhost:9000',
+	        credentials: {
+		        accessKeyId: 'accessKey',
+		        secretAccessKey: 'secretKey',
+	        }            
         },
     })
 

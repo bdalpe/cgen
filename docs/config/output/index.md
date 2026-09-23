@@ -15,11 +15,10 @@ outputs:
     spoolSize: 25000
     flushInterval: 60000
     s3config:
-      endPoint: localhost
-      port: 9000
-      useSSL: false
-      accessKey: minioadmin
-      secretKey: minioadmin
+      endPoint: "http://localhost:9000"
+      credentials:
+        accessKey: minioadmin
+        secretKey: minioadmin
 routes:
   - generator: simple
     output:
